@@ -55,7 +55,7 @@
 #include <vector>
 #include <cmath>
 #include <opencv2/core/core.hpp>
-#include "Thirdparty/DBoW2/DUtils/Random.h"
+//#include <DBoW2/DUtils/Random.h>
 #include <algorithm>
 
 using namespace std;
@@ -64,7 +64,7 @@ namespace ORB_SLAM2
 {
 
 
-PnPsolver::PnPsolver(const Frame &F, const vector<MapPoint*> &vpMapPointMatches):
+PnPsolver::PnPsolver(const Frame &F, const std::vector<MapPoint*> &vpMapPointMatches):
     pws(0), us(0), alphas(0), pcs(0), maximum_number_of_correspondences(0), number_of_correspondences(0), mnInliersi(0),
     mnIterations(0), mnBestInliers(0), N(0)
 {
@@ -162,7 +162,7 @@ cv::Mat PnPsolver::find(vector<bool> &vbInliers, int &nInliers)
     return iterate(mRansacMaxIts,bFlag,vbInliers,nInliers);    
 }
 
-cv::Mat PnPsolver::iterate(int nIterations, bool &bNoMore, vector<bool> &vbInliers, int &nInliers)
+cv::Mat PnPsolver::iterate(int nIterations, bool &bNoMore, std::vector<bool> &vbInliers, int &nInliers)
 {
     bNoMore = false;
     vbInliers.clear();
@@ -176,7 +176,7 @@ cv::Mat PnPsolver::iterate(int nIterations, bool &bNoMore, vector<bool> &vbInlie
         return cv::Mat();
     }
 
-    vector<size_t> vAvailableIndices;
+    std::vector<size_t> vAvailableIndices;
 
     int nCurrentIterations = 0;
     while(mnIterations<mRansacMaxIts || nCurrentIterations<nIterations)
@@ -190,7 +190,8 @@ cv::Mat PnPsolver::iterate(int nIterations, bool &bNoMore, vector<bool> &vbInlie
         // Get min set of points
         for(short i = 0; i < mRansacMinSet; ++i)
         {
-            int randi = DUtils::Random::RandomInt(0, vAvailableIndices.size()-1);
+            //int randi = DUtils::Random::RandomInt(0, vAvailableIndices.size()-1);
+          int randi = rand() % vAvailableIndices.size();
 
             int idx = vAvailableIndices[randi];
 
@@ -226,7 +227,7 @@ cv::Mat PnPsolver::iterate(int nIterations, bool &bNoMore, vector<bool> &vbInlie
             if(Refine())
             {
                 nInliers = mnRefinedInliers;
-                vbInliers = vector<bool>(mvpMapPointMatches.size(),false);
+                vbInliers = std::vector<bool>(mvpMapPointMatches.size(),false);
                 for(int i=0; i<N; i++)
                 {
                     if(mvbRefinedInliers[i])
@@ -244,7 +245,7 @@ cv::Mat PnPsolver::iterate(int nIterations, bool &bNoMore, vector<bool> &vbInlie
         if(mnBestInliers>=mRansacMinInliers)
         {
             nInliers=mnBestInliers;
-            vbInliers = vector<bool>(mvpMapPointMatches.size(),false);
+            vbInliers = std::vector<bool>(mvpMapPointMatches.size(),false);
             for(int i=0; i<N; i++)
             {
                 if(mvbBestInliers[i])
@@ -259,7 +260,7 @@ cv::Mat PnPsolver::iterate(int nIterations, bool &bNoMore, vector<bool> &vbInlie
 
 bool PnPsolver::Refine()
 {
-    vector<int> vIndices;
+    std::vector<int> vIndices;
     vIndices.reserve(mvbBestInliers.size());
 
     for(size_t i=0; i<mvbBestInliers.size(); i++)

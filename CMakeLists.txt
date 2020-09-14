@@ -1,49 +1,45 @@
 cmake_minimum_required(VERSION 2.8)
 project(ORB_SLAM2)
 
-IF(NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE Release)
-ENDIF()
-
-MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
-
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall  -O3 -march=native ")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3 -march=native")
-
-# Check C++11 or C++0x support
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-   add_definitions(-DCOMPILEDWITHC11)
-   message(STATUS "Using flag -std=c++11.")
-elseif(COMPILER_SUPPORTS_CXX0X)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-   add_definitions(-DCOMPILEDWITHC0X)
-   message(STATUS "Using flag -std=c++0x.")
-else()
-   message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-endif()
-
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
-find_package(OpenCV 3.0 QUIET)
-if(NOT OpenCV_FOUND)
-   find_package(OpenCV 2.4.3 QUIET)
-   if(NOT OpenCV_FOUND)
-      message(FATAL_ERROR "OpenCV > 2.4.3 not found.")
-   endif()
-endif()
+# Download automatically, you can also just copy the conan.cmake file
+if (NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+   message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+   file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.15/conan.cmake"
+           "${CMAKE_BINARY_DIR}/conan.cmake")
+endif ()
+include(${CMAKE_BINARY_DIR}/conan.cmake)
 
+
+conan_cmake_run(
+        REQUIRES
+        eigen/3.3.7@shuangliu1992/master
+        dbow2/1.0.0@shuangliu1992/master
+        g2o/20200410@shuangliu1992/master
+        pangolin/1.0.0@shuangliu1992/master
+        opencv/4.4.0@shuangliu1992/master
+        BASIC_SETUP CMAKE_TARGETS KEEP_RPATHS
+        BUILD outdated
+)
+
+set(Eigen3_DIR ${CONAN_EIGEN_ROOT}/share/eigen3/cmake)
 find_package(Eigen3 REQUIRED)
 find_package(Pangolin REQUIRED)
+find_package(DBoW2 REQUIRED)
+find_package(g2o REQUIRED)
+set(OpenCV_DIR ${CONAN_OPENCV_ROOT}/lib/cmake/opencv4)
+find_package(OpenCV 4 REQUIRED)
+
+add_definitions(-DCOMPILEDWITHC11)
 
 include_directories(
 ${PROJECT_SOURCE_DIR}
 ${PROJECT_SOURCE_DIR}/include
 ${EIGEN3_INCLUDE_DIR}
 ${Pangolin_INCLUDE_DIRS}
+${DBoW2_INCLUDE_DIRS}
+${CONAN_G2O_ROOT}/include
 )
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
@@ -74,8 +70,9 @@ target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
-${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
-${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
+${DBoW2_LIBRARIES}
+g2o::g2o_cli_library
+g2o::types_sim3
 )
 
 # Build examples
