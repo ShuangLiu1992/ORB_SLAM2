@@ -31,8 +31,8 @@
 
 using namespace std;
 
-void LoadImages(const string &strPathToSequence, vector<string> &vstrImageLeft,
-                vector<string> &vstrImageRight, vector<double> &vTimestamps);
+void LoadImages(const std::string&strPathToSequence, std::vector<string> &vstrImageLeft,
+                std::vector<string> &vstrImageRight, std::vector<double> &vTimestamps);
 
 int main(int argc, char **argv)
 {
@@ -43,9 +43,9 @@ int main(int argc, char **argv)
     }
 
     // Retrieve paths to images
-    vector<string> vstrImageLeft;
-    vector<string> vstrImageRight;
-    vector<double> vTimestamps;
+    std::vector<string> vstrImageLeft;
+    std::vector<string> vstrImageRight;
+    std::vector<double> vTimestamps;
     LoadImages(string(argv[3]), vstrImageLeft, vstrImageRight, vTimestamps);
 
     const int nImages = vstrImageLeft.size();
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
     ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::STEREO,true);
 
     // Vector for tracking time statistics
-    vector<float> vTimesTrack;
+    std::vector<float> vTimesTrack;
     vTimesTrack.resize(nImages);
 
     cout << endl << "-------" << endl;
@@ -127,15 +127,15 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void LoadImages(const string &strPathToSequence, vector<string> &vstrImageLeft,
-                vector<string> &vstrImageRight, vector<double> &vTimestamps)
+void LoadImages(const std::string&strPathToSequence, std::vector<string> &vstrImageLeft,
+                std::vector<string> &vstrImageRight, std::vector<double> &vTimestamps)
 {
     ifstream fTimes;
-    string strPathTimeFile = strPathToSequence + "/times.txt";
+    std::stringstrPathTimeFile = strPathToSequence + "/times.txt";
     fTimes.open(strPathTimeFile.c_str());
     while(!fTimes.eof())
     {
-        string s;
+        std::strings;
         getline(fTimes,s);
         if(!s.empty())
         {
@@ -147,8 +147,8 @@ void LoadImages(const string &strPathToSequence, vector<string> &vstrImageLeft,
         }
     }
 
-    string strPrefixLeft = strPathToSequence + "/image_0/";
-    string strPrefixRight = strPathToSequence + "/image_1/";
+    std::stringstrPrefixLeft = strPathToSequence + "/image_0/";
+    std::stringstrPrefixRight = strPathToSequence + "/image_1/";
 
     const int nTimes = vTimestamps.size();
     vstrImageLeft.resize(nTimes);

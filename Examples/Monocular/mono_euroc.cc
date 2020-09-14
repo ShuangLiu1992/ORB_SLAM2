@@ -30,8 +30,8 @@
 
 using namespace std;
 
-void LoadImages(const string &strImagePath, const string &strPathTimes,
-                vector<string> &vstrImages, vector<double> &vTimeStamps);
+void LoadImages(const std::string&strImagePath, const std::string&strPathTimes,
+                std::vector<string> &vstrImages, std::vector<double> &vTimeStamps);
 
 int main(int argc, char **argv)
 {
@@ -42,8 +42,8 @@ int main(int argc, char **argv)
     }
 
     // Retrieve paths to images
-    vector<string> vstrImageFilenames;
-    vector<double> vTimestamps;
+    std::vector<string> vstrImageFilenames;
+    std::vector<double> vTimestamps;
     LoadImages(string(argv[3]), string(argv[4]), vstrImageFilenames, vTimestamps);
 
     int nImages = vstrImageFilenames.size();
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
     ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR,true);
 
     // Vector for tracking time statistics
-    vector<float> vTimesTrack;
+    std::vector<float> vTimesTrack;
     vTimesTrack.resize(nImages);
 
     cout << endl << "-------" << endl;
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
     for(int ni=0; ni<nImages; ni++)
     {
         // Read image from file
-        im = cv::imread(vstrImageFilenames[ni],CV_LOAD_IMAGE_UNCHANGED);
+        im = cv::imread(vstrImageFilenames[ni],cv::IMREAD_UNCHANGED);
         double tframe = vTimestamps[ni];
 
         if(im.empty())
@@ -130,8 +130,8 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void LoadImages(const string &strImagePath, const string &strPathTimes,
-                vector<string> &vstrImages, vector<double> &vTimeStamps)
+void LoadImages(const std::string&strImagePath, const std::string&strPathTimes,
+                std::vector<string> &vstrImages, std::vector<double> &vTimeStamps)
 {
     ifstream fTimes;
     fTimes.open(strPathTimes.c_str());
@@ -139,7 +139,7 @@ void LoadImages(const string &strImagePath, const string &strPathTimes,
     vstrImages.reserve(5000);
     while(!fTimes.eof())
     {
-        string s;
+        std::string s;
         getline(fTimes,s);
         if(!s.empty())
         {

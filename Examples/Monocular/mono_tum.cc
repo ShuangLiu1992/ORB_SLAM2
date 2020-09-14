@@ -30,8 +30,8 @@
 
 using namespace std;
 
-void LoadImages(const string &strFile, vector<string> &vstrImageFilenames,
-                vector<double> &vTimestamps);
+void LoadImages(const std::string&strFile, std::vector<string> &vstrImageFilenames,
+                std::vector<double> &vTimestamps);
 
 int main(int argc, char **argv)
 {
@@ -42,9 +42,9 @@ int main(int argc, char **argv)
     }
 
     // Retrieve paths to images
-    vector<string> vstrImageFilenames;
-    vector<double> vTimestamps;
-    string strFile = string(argv[3])+"/rgb.txt";
+    std::vector<string> vstrImageFilenames;
+    std::vector<double> vTimestamps;
+    std::string strFile = string(argv[3])+"/rgb.txt";
     LoadImages(strFile, vstrImageFilenames, vTimestamps);
 
     int nImages = vstrImageFilenames.size();
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
     ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR,true);
 
     // Vector for tracking time statistics
-    vector<float> vTimesTrack;
+    std::vector<float> vTimesTrack;
     vTimesTrack.resize(nImages);
 
     cout << endl << "-------" << endl;
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
     for(int ni=0; ni<nImages; ni++)
     {
         // Read image from file
-        im = cv::imread(string(argv[3])+"/"+vstrImageFilenames[ni],CV_LOAD_IMAGE_UNCHANGED);
+        im = cv::imread(string(argv[3])+"/"+vstrImageFilenames[ni],cv::IMREAD_UNCHANGED);
         double tframe = vTimestamps[ni];
 
         if(im.empty())
@@ -125,27 +125,27 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void LoadImages(const string &strFile, vector<string> &vstrImageFilenames, vector<double> &vTimestamps)
+void LoadImages(const std::string&strFile, std::vector<string> &vstrImageFilenames, std::vector<double> &vTimestamps)
 {
     ifstream f;
     f.open(strFile.c_str());
 
     // skip first three lines
-    string s0;
+    std::string s0;
     getline(f,s0);
     getline(f,s0);
     getline(f,s0);
 
     while(!f.eof())
     {
-        string s;
+        std::string s;
         getline(f,s);
         if(!s.empty())
         {
             stringstream ss;
             ss << s;
             double t;
-            string sRGB;
+            std::string sRGB;
             ss >> t;
             vTimestamps.push_back(t);
             ss >> sRGB;
